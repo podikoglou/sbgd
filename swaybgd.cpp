@@ -5,6 +5,7 @@
 #include <dirent.h>
 #include <filesystem>
 #include <stdio.h>
+#include <sys/wait.h>
 #include <sysexits.h>
 #include <unistd.h>
 #include <vector>
@@ -79,7 +80,7 @@ int main(int argc, char **argv) {
   // seed rng with time (should be fine)
   std::srand(std::time(0));
 
-  while (pid == -2) {
+  while (true) {
     // read walls and choose a random one
     auto walls = read_walls(path);
     auto wall = walls[std::rand() % walls.size()];
@@ -99,23 +100,9 @@ int main(int argc, char **argv) {
       // in this process, await a signal
       printf("child pid is: %d\n", pid);
 
-      // register signal handler
-      signal(SIGUSR1, [](int sig) {
-        kill(pid, SIGTERM);
-
-        pid = -2;
-      });
-
-      // suspend until we receive SIGUSR_1
-      sigset_t sigset, sigset_old;
-      sigemptyset(&sigset);
-      sigaddset(&sigset, SIGUSR1);
-
-      sigprocmask(SIG_BLOCK, &sigset, &sigset_old);
-
-      sigsuspend(&sigset_old);
-
-      sigprocmask(SIG_UNBLOCK, &sigset, NULL);
+      int status;
+      printf("waiting for pid %d\n", pid);
+      waitpid(pid, &status, 0);
     }
   }
 
