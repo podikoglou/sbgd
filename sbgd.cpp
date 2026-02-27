@@ -107,6 +107,11 @@ int main(int argc, char **argv) {
       return EX_OSERR;
     }
 
+    if (walls.empty()) {
+      fprintf(stderr, "error: couldn't find any wallpapers\n");
+      return EXIT_FAILURE;
+    }
+
     fs::path wall = walls[std::rand() % walls.size()];
 
     // fork the process
