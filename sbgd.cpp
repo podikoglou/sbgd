@@ -5,6 +5,7 @@
 #include <cstring>
 #include <dirent.h>
 #include <filesystem>
+#include <getopt.h>
 #include <iterator>
 #include <stdio.h>
 #include <sys/wait.h>
@@ -77,15 +78,26 @@ std::vector<std::string> make_args(fs::path wall_path) {
 }
 
 int main(int argc, char **argv) {
-  /* validate arguments */
-  if (argc < 2) {
-    fprintf(stderr, "usage: %s <dir>\n", argv[0]);
-    return EX_USAGE;
+  // parse cli args
+  bool daemonize;
+  fs::path path;
+
+  int opt;
+  while ((opt = getopt(argc, argv, "hd:")) != -1) {
+    switch (opt) {
+    case 'd':
+      daemonize = true;
+      break;
+    case 'h':
+    default:
+      fprintf(stderr, "usage: %s [-d] dir\n", argv[0]);
+      return EX_USAGE;
+    }
   }
 
-  bool daemonize = argv[1][0] == '-' && argv[1][1] == 'd';
-  fs::path path(daemonize ? argv[2] : argv[1]);
+  path = fs::path(argv[optind]);
 
+  // optionally daemonize
   if (daemonize) {
     int daemon_result;
     if ((daemon_result = daemon(0, 0)) != 0) {
