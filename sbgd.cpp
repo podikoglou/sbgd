@@ -99,7 +99,14 @@ int main(int argc, char **argv) {
 
   while (true) {
     // read walls and choose a random one
-    std::vector<fs::path> walls = read_walls(path);
+    std::vector<fs::path> walls;
+    try {
+      walls = read_walls(path);
+    } catch (const fs::filesystem_error &error) {
+      fprintf(stderr, "%s\n", error.what());
+      return EX_OSERR;
+    }
+
     fs::path wall = walls[std::rand() % walls.size()];
 
     // fork the process
