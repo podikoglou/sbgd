@@ -1,2 +1,2 @@
-swaybgd: swaybgd.cpp
-	g++ -Wall -std=c++17 -o swaybgd swaybgd.cpp
+sbgd: sbgd.cpp
+	g++ -Wall -std=c++17 -o sbgd sbgd.cpp
