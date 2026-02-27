@@ -69,7 +69,16 @@ int main(int argc, char **argv) {
     return EX_USAGE;
   }
 
-  fs::path path(argv[1]);
+  bool daemonize = argv[1][0] == '-' && argv[1][1] == 'd';
+  fs::path path(daemonize ? argv[2] : argv[1]);
+
+  if (daemonize) {
+    int daemon_result;
+    if ((daemon_result = daemon(0, 0)) != 0) {
+      fprintf(stderr, "call to daemon() failed: %d\n", daemon_result);
+      return EX_OSERR;
+    }
+  }
 
   // seed rng with time (should be fine)
   std::srand(std::time(0));
