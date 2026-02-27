@@ -101,17 +101,23 @@ int main(int argc, char **argv) {
 
       // register signal handler
       signal(SIGUSR1, [](int sig) {
-        kill(pid, SIGTERM); // <-- kill
+        kill(pid, SIGTERM);
 
         pid = -2;
       });
 
-      while (pid != -2) {
-      }
+      // suspend until we receive SIGUSR_1
+      sigset_t sigset, sigset_old;
+      sigemptyset(&sigset);
+      sigaddset(&sigset, SIGUSR1);
+
+      sigprocmask(SIG_BLOCK, &sigset, &sigset_old);
+
+      sigsuspend(&sigset_old);
+
+      sigprocmask(SIG_UNBLOCK, &sigset, NULL);
     }
   }
-
-  // TODO: always clean up before exiting
 
   return EX_OK;
 }
