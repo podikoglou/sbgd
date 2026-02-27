@@ -12,8 +12,7 @@
 
 namespace fs = std::filesystem;
 
-const std::vector<std::string> ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg",
-                                                     ".webp"};
+const std::vector<std::string> ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"};
 
 bool strings_eq_ignore_case(std::string a, std::string b) {
   if (a.length() != b.length())
