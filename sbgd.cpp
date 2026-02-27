@@ -79,7 +79,7 @@ std::vector<std::string> make_args(fs::path wall_path) {
 
 int main(int argc, char **argv) {
   // parse cli args
-  bool daemonize;
+  bool daemonize = false;
   fs::path path;
 
   int opt;
