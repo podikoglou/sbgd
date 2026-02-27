@@ -115,6 +115,8 @@ int main(int argc, char **argv) {
       c_str_args.push_back(nullptr);
 
       execvp("swaybg", c_str_args.data());
+      perror("execvp");
+      _exit(1);
     } else {
       // in this process, await a signal
       printf("child pid is: %d\n", pid);
