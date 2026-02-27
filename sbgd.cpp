@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
   fs::path path;
 
   int opt;
-  while ((opt = getopt(argc, argv, "hd:")) != -1) {
+  while ((opt = getopt(argc, argv, "hd")) != -1) {
     switch (opt) {
     case 'd':
       daemonize = true;
@@ -93,6 +93,11 @@ int main(int argc, char **argv) {
       fprintf(stderr, "usage: %s [-d] dir\n", argv[0]);
       return EX_USAGE;
     }
+  }
+
+  if (optind >= argc) {
+    fprintf(stderr, "expected an argument after options");
+    return EX_USAGE;
   }
 
   path = fs::path(argv[optind]);
