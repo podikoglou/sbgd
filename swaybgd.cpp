@@ -14,7 +14,10 @@ namespace fs = std::filesystem;
 const std::vector<std::string> ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg",
                                                      ".webp"};
 
-__pid_t pid;
+// we use this special default value of -2 (-1 is reserved for errors by fork())
+// to signify that we must start swaybg. this value is also used for when we are
+// restarting it
+__pid_t pid = -2;
 
 bool strings_eq_ignore_case(std::string a, std::string b) {
   if (a.length() != b.length())
@@ -76,31 +79,35 @@ int main(int argc, char **argv) {
   // seed rng with time (should be fine)
   std::srand(std::time(0));
 
-  auto walls = read_walls(path);
+  while (pid == -2) {
+    // read walls and choose a random one
+    auto walls = read_walls(path);
+    auto wall = walls[std::rand() % walls.size()];
 
-  auto wall = walls[std::rand() % walls.size()];
+    // fork the process
+    pid = fork();
 
-  // fork the process
-  pid = fork();
+    if (pid == 0) {
+      // run swaybg in the child
 
-  if (pid == 0) {
-    // run swaybg in the child
+      // maybe allow to pass some/all args
+      char *args[] = {strdup("swaybg"), strdup("--image"), strdup(wall.c_str()),
+                      nullptr};
 
-    // maybe allow to pass some/all args
-    char *args[] = {strdup("swaybg"), strdup("--image"), strdup(wall.c_str()),
-                    nullptr};
+      execvp("swaybg", args);
+    } else {
+      // in this process, await a signal
+      printf("child pid is: %d\n", pid);
 
-    execvp("swaybg", args);
-  } else {
-    // in this process, await a signal
-    printf("child pid is: %d\n", pid);
+      // register signal handler
+      signal(SIGUSR1, [](int sig) {
+        kill(pid, SIGTERM); // <-- kill
 
-    // register signal handler
-    signal(SIGUSR1, [](int sig) {
-      kill(pid, SIGTERM); // <-- kill
-    });
+        pid = -2;
+      });
 
-    for (;;) {
+      while (pid != -2) {
+      }
     }
   }
 
