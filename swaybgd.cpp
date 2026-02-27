@@ -14,6 +14,8 @@ namespace fs = std::filesystem;
 const std::vector<std::string> ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg",
                                                      ".webp"};
 
+__pid_t pid;
+
 bool strings_eq_ignore_case(std::string a, std::string b) {
   if (a.length() != b.length())
     return false;
@@ -78,27 +80,31 @@ int main(int argc, char **argv) {
 
   auto wall = walls[std::rand() % walls.size()];
 
-  // register signal handler
-  signal(SIGUSR1, [](int sig) {
-    printf("ueee\n");
-    // TODO: figure out a way to kill swaybgd from here. currently execvp
-    // blocks. how can we make it non blocking and just get the pid so we can
-    // kill it and start another one?
-  });
-
-  // run swaybg
-  int pid = fork();
+  // fork the process
+  pid = fork();
 
   if (pid == 0) {
-    // child
+    // run swaybg in the child
+
+    // maybe allow to pass some/all args
     char *args[] = {strdup("swaybg"), strdup("--image"), strdup(wall.c_str()),
                     nullptr};
 
     execvp("swaybg", args);
   } else {
-    while (true) {
+    // in this process, await a signal
+    printf("child pid is: %d\n", pid);
+
+    // register signal handler
+    signal(SIGUSR1, [](int sig) {
+      kill(pid, SIGTERM); // <-- kill
+    });
+
+    for (;;) {
     }
   }
+
+  // TODO: always clean up before exiting
 
   return EX_OK;
 }
