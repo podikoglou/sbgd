@@ -1,9 +1,11 @@
+#include <algorithm>
 #include <cctype>
 #include <csignal>
 #include <cstdio>
 #include <cstring>
 #include <dirent.h>
 #include <filesystem>
+#include <iterator>
 #include <stdio.h>
 #include <sys/wait.h>
 #include <sysexits.h>
@@ -62,6 +64,18 @@ std::vector<fs::path> read_walls(fs::path path) {
   return paths;
 }
 
+std::vector<std::string> make_args(fs::path wall_path) {
+
+  // TODO: maybe allow to pass some/all args
+  std::vector<std::string> args{
+      "swaybg",
+      "--image",
+      wall_path,
+  };
+
+  return args;
+}
+
 int main(int argc, char **argv) {
   /* validate arguments */
   if (argc < 2) {
@@ -85,20 +99,22 @@ int main(int argc, char **argv) {
 
   while (true) {
     // read walls and choose a random one
-    auto walls = read_walls(path);
-    auto wall = walls[std::rand() % walls.size()];
+    std::vector<fs::path> walls = read_walls(path);
+    fs::path wall = walls[std::rand() % walls.size()];
 
     // fork the process
     __pid_t pid = fork();
 
     if (pid == 0) {
       // run swaybg in the child
+      std::vector<std::string> args = make_args(wall);
+      std::vector<char *> c_str_args;
 
-      // maybe allow to pass some/all args
-      char *args[] = {strdup("swaybg"), strdup("--image"), strdup(wall.c_str()),
-                      nullptr};
+      std::transform(args.begin(), args.end(), std::back_inserter(c_str_args),
+                     [](std::string &arg) { return arg.data(); });
+      c_str_args.push_back(nullptr);
 
-      execvp("swaybg", args);
+      execvp("swaybg", c_str_args.data());
     } else {
       // in this process, await a signal
       printf("child pid is: %d\n", pid);
