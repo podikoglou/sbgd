@@ -15,11 +15,6 @@ namespace fs = std::filesystem;
 const std::vector<std::string> ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg",
                                                      ".webp"};
 
-// we use this special default value of -2 (-1 is reserved for errors by fork())
-// to signify that we must start swaybg. this value is also used for when we are
-// restarting it
-__pid_t pid = -2;
-
 bool strings_eq_ignore_case(std::string a, std::string b) {
   if (a.length() != b.length())
     return false;
@@ -86,7 +81,7 @@ int main(int argc, char **argv) {
     auto wall = walls[std::rand() % walls.size()];
 
     // fork the process
-    pid = fork();
+    __pid_t pid = fork();
 
     if (pid == 0) {
       // run swaybg in the child
