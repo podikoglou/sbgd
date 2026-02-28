@@ -27,7 +27,7 @@ sbgd ~/docs/walls
 Where `~/docs/walls` is a directory containing wallpapers. A few notes:
 - Accepted file formats for wallpapers are (case insensitive): .jpg, .jpeg, .png
 
-This doesn't run in the background as a daemon by itself. If you want it it to do that, use the `-d flag`
+This doesn't run in the background as a daemon by itself. If you want that, use the `-d` flag
 ```
 sbgd -d ~/docs/walls
 ```
