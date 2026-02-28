@@ -6,3 +6,6 @@ sbgd: sbgd.cpp
 
 clean:
 	rm sbgd
+
+install: sbgd
+	cp sbgd /usr/local/bin
