@@ -26,3 +26,8 @@ This doesn't run in the background as a daemon by itself. If you want it it to d
 ```
 sbgd -d ~/docs/walls
 ```
+
+To change your wallpaper, simply kill `swaybg`:
+```
+pkill swaybg
+```
