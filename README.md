@@ -31,3 +31,14 @@ To change your wallpaper, simply kill `swaybg`:
 ```
 pkill swaybg
 ```
+
+### Using with river
+You can add this to make sbgd auto-start with river:
+```
+riverctl spawn "sbgd ~/docs/walls"
+```
+
+And set a keybinding to change your wallpaper:
+```
+riverctl map normal Alt+Shift L spawn "pkill swaybg"
+```
