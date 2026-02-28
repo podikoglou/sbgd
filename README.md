@@ -3,14 +3,19 @@ sbgd is a small daemon which runs a swaybg process with a random wallpaper and
 restarts it (changing the wallpaper) when it is killed.
 
 ## Building from source
-you can build sbgd from source using
+You can build sbgd from source using
 ```
 git clone https://github.com/podikoglou/sbgd
 cd sbgd
 make
 ```
 
-dependencies:
+You can then install it with
+```
+sudo make install
+```
+
+Dependencies:
 - gcc (you can use clang using `make CC=clang++`)
 
 ## Usage 
